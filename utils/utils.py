@@ -91,4 +91,4 @@ def calculate_acc(probs, labels):
     Smiling_acc = (labels[:,0] == preds_Smiling).mean()
     Wavy_Hair_acc = (labels[:,1] == preds_Wavy_Hair).mean()
     Male_acc = (labels[:,2] == preds_Male).mean()
-    return Smiling_acc, Wavy_Hair_acc, Male_acc
+    return (Smiling_acc, Wavy_Hair_acc, Male_acc)

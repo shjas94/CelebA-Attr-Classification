@@ -34,10 +34,10 @@ def train_one_epoch(epoch,
         train_loss = loss.item()
         train_loss_list.append(train_loss)
         
-        train_smiling_acc, train_wavy_acc, train_male_acc = calculate_acc(probs, labels)
-        smiling_acc_list.append(train_smiling_acc)
-        wavy_acc_list.append(train_wavy_acc)
-        male_acc_list.append(train_male_acc)
+        train_accs = calculate_acc(probs, labels) # (smiling_acc, wavy_acc, male_acc)
+        smiling_acc_list.append(train_accs[0])
+        wavy_acc_list.append(train_accs[1])
+        male_acc_list.append(train_accs[2])
         
         desc = f"Train Epoch : {epoch+1}, Loss : {np.mean(train_loss_list):.2f}, Smiling Accuracy : {np.mean(smiling_acc_list):.2f}, Wavy Hair Accuracy : {np.mean(wavy_acc_list):.2f}, Male Accuracy : {np.mean(male_acc_list):.2f}"
         pbar.set_description(desc)
@@ -63,10 +63,10 @@ def valid_one_epoch(epoch,
         valid_loss = loss.item()
         valid_loss_list.append(valid_loss)
         
-        valid_smiling_acc, valid_wavy_acc, valid_male_acc = calculate_acc(probs, labels)
-        smiling_acc_list.append(valid_smiling_acc)
-        wavy_acc_list.append(valid_wavy_acc)
-        male_acc_list.append(valid_male_acc)
+        valid_accs = calculate_acc(probs, labels) # (smiling_acc, wavy_acc, male_acc)
+        smiling_acc_list.append(valid_accs[0])
+        wavy_acc_list.append(valid_accs[1])
+        male_acc_list.append(valid_accs[2])
              
         desc = f"Valid Epoch : {epoch+1}, Loss : {np.mean(valid_loss_list):.2f}, Smiling Accuracy : {np.mean(smiling_acc_list):.2f}, Wavy Hair Accuracy : {np.mean(wavy_acc_list):.2f}, Male Accuracy : {np.mean(male_acc_list):.2f}"
         pbar.set_description(desc)

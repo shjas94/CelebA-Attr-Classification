@@ -168,7 +168,7 @@ def inference_main(cfg):
             '''
             labels = np.tile([[1, 0, 1]], reps=[probs.shape[0], 1])
             accuracies = calculate_acc(probs, labels)
-            print(f"\n-----Not Smiling & Wavy Hair Inference Result-----\n" \
+            print(f"\n-----Smiling & Not Wavy Hair Inference Result-----\n" \
             f"Smiling Acc : {accuracies[0]:.2f}, " \
             f"Not Wavy Hair Acc : {accuracies[1]:.2f}\n")
         ##########################################

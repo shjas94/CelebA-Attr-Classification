@@ -1,7 +1,8 @@
 import math
 import torch.nn as nn
 import torch.nn.functional as F
-from models.modules import *
+from models.modules import BasicBlock, BottleneckBlock, \
+    MBConv, FusedMBConv
     
 
 class CustomResNet(nn.Module):

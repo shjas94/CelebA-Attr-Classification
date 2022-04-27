@@ -1,22 +1,21 @@
 import torchvision.transforms as T
 
-def get_train_transforms(cfg):
-    return T.Compose([
+def get_transforms(img_size, mode='train'):
+    if mode == 'train':
+        return T.Compose([
+            T.ToTensor(),
+            T.Resize((img_size, img_size)),
+            T.RandomHorizontalFlip(),
+            T.RandomVerticalFlip(),
+            T.RandomRotation(30)
+        ])
+    elif mode == 'valid':
+        return T.Compose([
         T.ToTensor(),
-        T.Resize((cfg.img_size, cfg.img_size)),
-        T.RandomHorizontalFlip(),
-        T.RandomVerticalFlip(),
-        T.RandomRotation(30)
+        T.Resize((img_size, img_size))
     ])
-    
-def get_valid_transforms(cfg):
-    return T.Compose([
+    elif mode == 'test':
+        return T.Compose([
         T.ToTensor(),
-        T.Resize((cfg.img_size, cfg.img_size))
-    ])
-    
-def get_test_transforms(cfg):
-    return T.Compose([
-        T.ToTensor(),
-        T.Resize((cfg.img_size, cfg.img_size))
+        T.Resize((img_size, img_size))
     ])

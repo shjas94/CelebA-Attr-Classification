@@ -1,22 +1,22 @@
 import argparse
-from models.models import *
-from utils.utils import *
-from trainer import *
+from trainer import trainer
+from utils.utils import get_model, \
+    unzip_img_files, unzip_files
 
 def main(cfg):
     
     '''
     Make sure img_align_celeba.zip, list_attr_celeba.csv.zip, list_eval_partition.csv.zip files 
-    are under data_path!!!
+    are under cfg.data_path!!!
     '''
     
-    model = get_model(cfg.model)
-    make_dirs([cfg.save_path])
     # Unzip Image & Partition File & Attr File #
     unzip_img_files(cfg.data_path)
     unzip_files(cfg.data_path, 'list_eval_partition.zip', 'list_eval_partition.csv')
     unzip_files(cfg.data_path, 'list_attr_celeba.zip', 'list_attr_celeba.csv')
-    ############################################ 
+    ############################################
+    
+    model = get_model(cfg.model)
     trainer(cfg, model)
 
 if __name__ == "__main__":

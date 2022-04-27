@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 import torch
 from zipfile import ZipFile
-from models.models import CustomResNet, CustomEfficientNet, effnetv2_s, effnetv2_m
+from utils.scheduler import CosineAnnealingWarmUpRestart
+from models.models import CustomResNet, CustomEfficientNet, \
+    effnetv2_s, effnetv2_m
 
 def seed_everything(seed):
     os.environ["PYTHONHASHSEED"] = str(seed)
@@ -16,13 +18,12 @@ def seed_everything(seed):
     np.random.seed(seed)
     random.seed(seed)
     
-def make_dirs(dirs):
-    for dir in dirs:
-        if not os.path.isdir(dir):
-            os.mkdir(dir)
-            print("Done!!")
-        else:
-            print("Dir already exists!!")
+def make_dir(dir):
+    if not os.path.isdir(dir):
+        os.mkdir(dir)
+        print("Done!!")
+    else:
+        print(f"Dir {dir} already exists!!")
     
 def unzip_img_files(path):
     imgs_zip_file = os.path.join(path, 'img_align_celeba.zip')
@@ -52,15 +53,15 @@ def unzip_files(path, source_file, target_file):
     else:
         raise FileNotFoundError
     
-
-def get_partition(cfg, partition):
-    '''
-                 0 : Train
-    partition == 1 : Validation
-                 2 : Test
-    '''
-    partition_info = pd.read_csv(os.path.join(cfg.data_path,'list_eval_partition.csv'))
-    return list(partition_info[partition_info['partition'] == partition].index)
+def get_partition(data_path, mode='train'):
+    partition={
+        'train':0,
+        'valid':1,
+        'test':2
+    }
+    partition_info = pd.read_csv(os.path.join(data_path,'list_eval_partition.csv'))
+    
+    return list(partition_info[partition_info['partition'] == partition[mode]].index)
 
 def get_optimizer(cfg, model):
     if cfg.optimizer == 'adamw':
@@ -79,6 +80,20 @@ def get_model(model_name):
         return effnetv2_s()
     else:
         raise ValueError
+
+def get_scheduler(scheduler, optimizer):
+    if scheduler == 'none':
+        return None
+    elif scheduler == 'cosinewarmup':
+        return CosineAnnealingWarmUpRestart(optimizer=optimizer, 
+                                            T_0=4, 
+                                            T_mult=1, 
+                                            eta_max=2e-4,  
+                                            T_up=1, 
+                                            gamma=0.5)
+    else:
+        print("Wrong Scheduler!!")
+        raise ValueError
     
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
@@ -92,3 +107,6 @@ def calculate_acc(probs, labels):
     Wavy_Hair_acc = (labels[:,1] == preds_Wavy_Hair).mean()
     Male_acc = (labels[:,2] == preds_Male).mean()
     return (Smiling_acc, Wavy_Hair_acc, Male_acc)
+
+def get_answer(probs_list):
+    pass

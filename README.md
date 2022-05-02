@@ -4,6 +4,7 @@
 ```
 .
 ├── README.md
+├── checkpoint
 ├── data
 │   ├── img_align_celeba.zip
 │   ├── list_attr_celeba.csv.zip
@@ -26,4 +27,9 @@
 # How to Train
 ```
 $ python main.py --run_name="Your run name"
+```
+
+# How to Evaluate
+```
+$ python inference.py --model_name="Your model_name"
 ```

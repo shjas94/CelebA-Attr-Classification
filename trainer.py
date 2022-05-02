@@ -9,7 +9,7 @@ from dataset.dataset import CelebA
 from dataset.augmentations import get_transforms
 from utils.earlystopping import EarlyStopping
 from utils.utils import calculate_acc, get_partition, seed_everything, \
-    get_optimizer, get_scheduler, get_lr, make_dir
+    get_optimizer, get_scheduler, get_lr, get_model, make_dir
 
 
 def train_one_epoch(epoch, 
@@ -48,8 +48,8 @@ def train_one_epoch(epoch,
             f"Smiling Accuracy : {np.mean(smiling_acc_list):.2f}, " \
             f"Wavy Hair Accuracy : {np.mean(wavy_acc_list):.2f}, " \
             f"Male Accuracy : {np.mean(male_acc_list):.2f}"
-            
         pbar.set_description(desc)
+        
     return np.mean(train_loss_list), (np.mean(smiling_acc_list), np.mean(wavy_acc_list), np.mean(male_acc_list))
 
 
@@ -87,11 +87,12 @@ def valid_one_epoch(epoch,
             f"Wavy Hair Accuracy : {np.mean(wavy_acc_list):.2f}, " \
             f"Male Accuracy : {np.mean(male_acc_list):.2f}"
         pbar.set_description(desc)
+        
     return np.mean(valid_loss_list), (np.mean(smiling_acc_list), np.mean(wavy_acc_list), np.mean(male_acc_list))
 
 
 
-def trainer(cfg, model):
+def trainer(cfg):
     seed_everything(cfg.seed_num)
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
@@ -111,8 +112,18 @@ def trainer(cfg, model):
     train_dataset = CelebA(cfg.data_path, transforms=train_transforms)
     valid_dataset = CelebA(cfg.data_path, transforms=valid_transforms)
     
-    train_loader = DataLoader(train_dataset, cfg.train_batch_size, drop_last=True, sampler=train_sampler)
-    valid_loader = DataLoader(valid_dataset, cfg.valid_batch_size, drop_last=False, sampler=valid_sampler)
+    train_loader = DataLoader(train_dataset, 
+                              cfg.train_batch_size, 
+                              drop_last=True, 
+                              num_workers=cfg.num_workers,
+                              pin_memory=use_cuda, 
+                              sampler=train_sampler)
+    valid_loader = DataLoader(valid_dataset, 
+                              cfg.valid_batch_size, 
+                              drop_last=False, 
+                              num_workers=cfg.num_workers,
+                              pin_memory=use_cuda, 
+                              sampler=valid_sampler)
     ##########################################
     
     if cfg.wandb:
@@ -132,7 +143,8 @@ def trainer(cfg, model):
     
     make_dir(cfg.save_path)
     save_path = os.path.join(cfg.save_path, cfg.run_name)
-
+    
+    model = get_model(cfg.model)
     model.to(device)
     for e in range(cfg.epoch):
         with torch.set_grad_enabled(True):

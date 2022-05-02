@@ -1,7 +1,6 @@
 import argparse
 from trainer import trainer
-from utils.utils import get_model, \
-    unzip_img_files, unzip_files
+from utils.utils import unzip_img_files, unzip_files
 
 def main(cfg):
     
@@ -16,8 +15,7 @@ def main(cfg):
     unzip_files(cfg.data_path, 'list_attr_celeba.zip', 'list_attr_celeba.csv')
     ############################################
     
-    model = get_model(cfg.model)
-    trainer(cfg, model)
+    trainer(cfg)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -28,11 +26,12 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=1e-06, help='Learning Rate')
     parser.add_argument('--train_batch_size', type=int, default=64)
     parser.add_argument('--valid_batch_size', type=int, default=32)
+    parser.add_argument('--num_workers', type=int, default=0, help='Num of threads to generate data')
     parser.add_argument('--optimizer', type=str, default='adamw', choices=('adam', 'adamw'))
     parser.add_argument('--weight_decay', type=float, default=1e-06)
     parser.add_argument('--scheduler', type=str, default='cosinewarmup', choices=('none', 'cosinewarmup'))
     parser.add_argument('--img_size', type=int, default=224, help='Size of input image')
-    parser.add_argument('--model', type=str, default='effnetV2s', choices=('customresnet', 'customefficientnet','effnetv2s'))
+    parser.add_argument('--model', type=str, default='effnetv2s', choices=('customresnet', 'customefficientnet','effnetv2s'))
     parser.add_argument('--patience', type=int, default=5, help='Patience time for early stopping')
     parser.add_argument('--wandb', default=True, action='store_true', help='Use wandb for logging')
     parser.add_argument('--run_name', type=str)
